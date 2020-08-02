@@ -1,22 +1,24 @@
 require 'pry'
 
 class TicTacToe
+    WIN_COMBINATIONS = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
+
     def initialize
         @board = [" ", " ", " ", " ", " ", " ", " ", " ", " ", ]
     end
 
-    WIN_COMBINATIONS = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]]
-
-    def board
-        puts "#{@board[0]}#{@board[1]}#{@board[2]}"
-        puts "#{@board[3]}#{@board[4]}#{@board[5]}"
-        puts "#{@board[6]}#{@board[7]}#{@board[8]}"
+    
+    def display_board
+        puts " #{@board[0]} | #{@board[1]} | #{@board[2]} "
+        puts "-----------"
+        puts " #{@board[3]} | #{@board[4]} | #{@board[5]} "
+        puts "-----------"
+        puts " #{@board[6]} | #{@board[7]} | #{@board[8]} "
 
     end
 
-    def input_to_index
-        my_input = gets.chomp
-        my_input = my_input.to_i -1
+    def input_to_index(user_input)
+        user_input.to_i - 1
     end
 
     def move(index, x_or_o = X)
@@ -24,15 +26,15 @@ class TicTacToe
     end
 
     def position_taken?(input)
-        if board[input] == "O" || board[input] == "X"
-            return false
-        else
+        if @board[input] == "O" || @board[input] == "X"
             return true
+        else
+            return false
         end
     end
 
-    def vaild_move?(input)
-        if input < 0 && input > 10 && position_taken?(input) == true
+    def valid_move?(input)
+        if input >= 0  && input < 9 && position_taken?(input) == false
             return true
         else 
             return false
@@ -41,27 +43,30 @@ class TicTacToe
 
     def turn
         puts "Specify a position between 1 and 9: "
-        input_to_index
-        if vaild_move?(input_to_index) == true
-            @board[input_to_index] =  current_player
+        user_in = gets.chomp
+         x = input_to_index(user_in)
+        #binding.pry
+        if valid_move?(x) == true
+            @board[x] = current_player
         else
             puts "Move is not valid. Try again."
             turn
         end
+        display_board
     end 
 
     def turn_count
         empty = @board.select do |m|
             m == " "
         end
-        x = 10 - empty.count
+        x = 9 - empty.count
     end
 
     def current_player
-        if even?(turncount)
-            return "X"
+        if turn_count.odd?
+            return "O"
         end
-        return "O"
+        return "X"
     end
 
     def won?
@@ -71,22 +76,20 @@ class TicTacToe
             m.each do |n|
                 if n != nil
                     x << @board[n]
-                    binding.pry
                 end
             end
             if x == ["X", "X", "X"] || x == ["O", "O", "O"]
-                return true
+                return m.flatten
             end
         end
         false
     end
 
     def full?
-        x = @board.find{ |m| " "}
-        if  x == nil
-            return true
-        else
+        if @board.include?(" ")
             return false
+        else
+            return true
         end
     end
 
@@ -99,8 +102,10 @@ class TicTacToe
     end
 
     def over?
-        if draw? == true || won? == true
-            reutrn true
+        if draw? == true 
+            return true
+        elsif won?
+            return true
         else
             return false
         end
@@ -108,13 +113,19 @@ class TicTacToe
 
     def winner
         if over? == true
-            puts "#{current_player} has won the game."
+            if current_player == "X"
+                puts "Congratulations O!"
+                return "O"
+            else
+                puts "Congratulations X!"
+                return "X"
+            end
         end
     end
 
     def play
         while over? == false do
-            board
+            draw?
             turn
 
 
@@ -125,7 +136,7 @@ class TicTacToe
             
         end
         if draw? == true
-            puts "This game ended in a draw."
+            puts "Cat's Game!"
         else
             winner
         end
@@ -135,7 +146,6 @@ class TicTacToe
 end
 
 
-x = TicTacToe.new
-@board = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-x.play
+# x = TicTacToe.new
+# x.play
 
